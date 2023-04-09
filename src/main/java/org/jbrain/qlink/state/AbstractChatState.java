@@ -192,7 +192,7 @@ public abstract class AbstractChatState extends AbstractState {
         QuotedStringTokenizer st = new QuotedStringTokenizer(text.substring(2));
         String cmd = st.nextToken(" ").toLowerCase();
         int pos = 0;
-        if (cmd.startsWith("sysmsg") && _session.isStaff()) {
+        if (cmd.startsWith("sysmsg") && _session.isStaff()) {//
           // Send SYSOLM;
           if (st.hasMoreTokens()) msg = st.nextToken("\n");
           if (msg != null) {
@@ -235,7 +235,7 @@ public abstract class AbstractChatState extends AbstractState {
             error = "Usage: //tos <user name>";
           }
         } else if (cmd.startsWith("reboot") && _session.isStaff()) {
-          // reboot server;
+          // To Do reboot server;
           if (st.hasMoreTokens()) msg = st.nextToken("\n");
           _session.getServer().reboot(msg);
         } else if (cmd.startsWith("test") && _session.isStaff()) {
@@ -324,11 +324,14 @@ public abstract class AbstractChatState extends AbstractState {
     QSeat user;
     int mySeat = -1;
 
-    _log.debug("Sending seat information");
+    _log.debug("Sending seat information -------------------------------------------------------------------------------------------------------------");
+    
     for (int i = 0, size = seats.length; i < size; i++) {
       user = seats[i];
       if (!_session.getHandle().equals(user.getHandle()))
-        if (bRoomChange) _session.send(new CL(user.getSeatID(), user.getHandle().toString()));
+        if (bRoomChange) {_session.send(new CL(user.getSeatID(), user.getHandle().toString()));
+			_log.debug("Sending sCL ----------------");
+		}
         else _session.send(new CA(user.getSeatID(), user.getHandle().toString()));
       else mySeat = user.getSeatID();
     }
@@ -336,8 +339,34 @@ public abstract class AbstractChatState extends AbstractState {
     else _session.send(new CE(23, _session.getHandle().toString()));
     _listener.resume();
     if (!bRoomChange && checkEmail()) _session.send(new NewMail());
+ 
+}
+  
+  
+  
+  protected void showSeatsAudit(QSeat[] seats, boolean bRoomChange) {
+    QSeat user;
+    int mySeat = -1;
+   
+    
+  
+      user = seats[seats.length-1];
+      
+    
+      mySeat = user.getSeatID();
+      
+      _log.debug("Sending Audit seat information"+ mySeat+" " );
+     if (mySeat < 200)  _session.send(new CE(0, _session.getHandle().toString()));
+    
+    //_session.send(new CL(user.getSeatID(), _session.getHandle().toString()));//Allows a room change and will adds the user to the room.
+	_log.debug("Sending sCL ----------------");
+	//_session.send(new CE(mySeat, _session.getHandle().toString()));
+		
+       
+    //_listener.resume();
+    if (!bRoomChange && checkEmail()) _session.send(new NewMail());
+   
   }
-
   protected void sendUserList() {
     QSeat[] seats = _room.getExtSeatInfoList();
     List l = new ArrayList();

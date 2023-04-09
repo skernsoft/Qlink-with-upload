@@ -39,7 +39,7 @@ import org.jbrain.qlink.db.DBUtils;
 public class PostMessage extends AbstractState {
   private static Logger _log = Logger.getLogger(PostMessage.class);
   private int _iBaseID;
-
+  public static int _IDf;
   /**
    * @uml.property name="_state"
    * @uml.associationEnd multiplicity="(0 1)"
@@ -49,7 +49,7 @@ public class PostMessage extends AbstractState {
   private StringBuffer _sbText = new StringBuffer();
   private int _iParentID;
   private int _iNextID;
-
+ 
   public PostMessage(QSession session, int bid, int pid, int nid) {
     super(session);
     if (_log.isDebugEnabled())
@@ -63,6 +63,7 @@ public class PostMessage extends AbstractState {
     _iBaseID = bid;
     _iParentID = pid;
     _iNextID = nid;
+    
   }
 
   public void activate() throws IOException {
@@ -75,7 +76,9 @@ public class PostMessage extends AbstractState {
     Connection conn = null;
     Statement stmt = null;
     ResultSet rs = null;
+
     int id;
+    int  r=0;
     String title = text.substring(6, 39).trim();
     String sql;
 
@@ -94,9 +97,14 @@ public class PostMessage extends AbstractState {
         // error
         _log.error("Cannot find ID to use for message");
       } else {
+		  _IDf = id;
+    _log.debug("_IDf "+_IDf);
+    
+     if(text.substring(0,4).equals("FILE")) r=-1;
+     _log.debug("replay "+r);
         // need to clean up headings and put in serial number.
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-        text = text.substring(0, 57) + sdf.format(new Date()) + " S# " + id + text.substring(80);
+        text =  text.substring(81);
         sql =
             "insert into messages (reference_id,parent_id,base_id,title,author,date,replies,text) VALUES ("
                 + id
@@ -108,7 +116,9 @@ public class PostMessage extends AbstractState {
                 + fix(title)
                 + "','"
                 + _session.getHandle()
-                + "',now(),0,'"
+                + "',now(),"
+                + r
+                + ",'"
                 + fix(text)
                 + "')";
         _log.debug(sql);
@@ -134,6 +144,7 @@ public class PostMessage extends AbstractState {
       DBUtils.close(rs);
       DBUtils.close(stmt);
       DBUtils.close(conn);
+ 
     }
   }
 
@@ -148,7 +159,7 @@ public class PostMessage extends AbstractState {
   public boolean execute(Action a) throws IOException {
     QState state;
     boolean rc = false;
-
+    _log.debug("Aktion a ");
     if (a instanceof AbortPosting) {
       _log.debug("User aborted posting");
       rc = true;
@@ -165,8 +176,30 @@ public class PostMessage extends AbstractState {
       _sbText.append(text.replace((char) 0x7f, '\n'));
       savePosting(_sbText.toString());
       _session.setState(_state);
-    }
+      //SKERN todo abbort and next
+     } else if (a instanceof AbortPosting) {
+      _log.debug("User aborted posting");
+      rc = true;
+      _session.setState(_state);
+    
+    } else if (a instanceof LastDescriptionLine) {
+      rc = true;
+      String text = ((LastDescriptionLine) a).getData();
+      _log.debug("Message End2: " + text);
+      _sbText.append(text.replace((char) 0x7f, '\n'));
+      
+      savePosting(_sbText.toString());
+      _session.setState(_state);
+    } 
+     
+     
+     
     if (!rc) rc = super.execute(a);
     return rc;
+  } 
+  public void terminate() {
+    _state.terminate();
   }
 }
+
+

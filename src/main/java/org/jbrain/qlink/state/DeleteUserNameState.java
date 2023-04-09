@@ -125,9 +125,10 @@ public class DeleteUserNameState extends AbstractState {
                 i + 1 == _lAccounts.size()));
       }
     } else {
+		_session.send(new SendSYSOLM("No removable users names"));//SKERN
       _session.send(
           new MenuItem(
-              0, "No removable users names", MenuItem.HEADING, MenuItem.COST_NO_CHARGE, true));
+              0, "", MenuItem.HEADING, MenuItem.COST_NO_CHARGE, true));
     }
   }
 

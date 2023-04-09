@@ -60,8 +60,8 @@ public abstract class AbstractState implements QState {
     QState state;
     boolean rc = false;
 
-    if (a instanceof LostConnection) {
-      _session.terminate();
+    if (a instanceof LostConnection) {	
+	_session.terminate();
       rc = true;
     } else if (a instanceof SuspendServiceAck) {
       _log.debug("Sending ACK for Suspend Service Request");
@@ -79,6 +79,16 @@ public abstract class AbstractState implements QState {
       _session.send(new LogoffAck(_session.getStartTime(), new Date()));
       _session.terminate();
       rc = true;
+      
+      
+      
+      
+      
+     } else if (a instanceof FileDescriptionString) {//SKERN
+     String _filename = ((FileDescriptionString) a).getData();
+     state = new SaveFileState(_session, _filename);
+     state.activate();
+     rc = true;
     } else if (a instanceof SendEmail) {
       String recipient = ((SendEmail) a).getData();
       state = new SendEmailState(_session, new QHandle(recipient));

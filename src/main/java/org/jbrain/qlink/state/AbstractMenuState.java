@@ -29,7 +29,7 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.jbrain.qlink.QSession;
 import org.jbrain.qlink.cmd.action.*;
-
+import org.jbrain.qlink.text.TextFormatter;
 class MenuEntry {
 
   private int _iID;
@@ -252,8 +252,15 @@ public abstract class AbstractMenuState extends AbstractState {
     PostingItem line;
 
     int size = _alMessages.size();
-    if (size == 0) _session.send(new PostingItem("No News (is good news)", PostingItem.LAST));
-    else {
+    if (size == 0) {
+	
+		_session.send(new PostingItem("No News (is good news) press F5 ", PostingItem.LAST));
+		
+		
+		 
+		_session.send(new SendEmptyMessage());
+   // SKERN now it work
+    } else {
       while (i < 4 && _iLines < size - 1) {
         i++;
         _iLines++;
@@ -302,4 +309,66 @@ public abstract class AbstractMenuState extends AbstractState {
     _hmMessages.clear();
     _alMessages.clear();
   }
+
+ protected void sendSurchList() throws IOException {
+    // we send these backwards from the List.
+    int i = 0;
+    MessageEntry m;
+    PostingItem line;
+    TextFormatter tf = new TextFormatter(TextFormatter.FORMAT_NONE, 39);
+    int size = _alMessages.size();
+    if (size == 0) {
+	_session.send(new InitDataSend(0, 0, 0, 0, 0));
+	    _session.send(new FileText("found no intem. press F5 ", true));
+		
+    } else {
+		_session.send(new InitDataSend(0, 0, 0, 0, 0));
+		_session.send(new FileText("found "+ size+"\n", false));
+      while (i < 4 && _iLines < size - 1) {
+        i++;
+        _iLines++;
+        m = (MessageEntry) _alMessages.get(size - _iLines);
+         tf.add(
+				"\n "+
+             // m.getID()+"  "+
+                m.getTitle()+"  "+
+                m.getAuthor()+"  "+
+             // m.getReplies()+"  "+
+                m.getDate()+"  "
+                );
+      }
+      _iLines++;
+      m = (MessageEntry) _alMessages.get(size - _iLines);
+      if (_iLines == size) {
+        // after the ++ above, we should be at end.
+       
+        tf.add(
+				"\n "+
+             // m.format.getID()+"  "+
+                m.getTitle()+"  "+
+                m.getAuthor()+"  "+
+             // m.getReplies()+"  "+
+                m.getDate()+"  "
+                );
+                _lText = tf.getList();
+        clearMessageList();
+      } else {
+        tf.add(
+				"\n "+
+             // m.getID()+"  "+
+                m.getTitle()+"  "+
+                m.getAuthor()+"  "+
+             // m.getReplies()+"  "+
+                m.getDate()+"  "
+                );
+           tf.add("Use RETURN to go on, F5 to cancel."); 
+           _lText = tf.getList();      
+        
+      }
+      clearLineCount();
+      sendPackedLines();
+    }
+  }
+
+
 }

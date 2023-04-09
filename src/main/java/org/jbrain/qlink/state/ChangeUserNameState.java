@@ -80,9 +80,12 @@ public class ChangeUserNameState extends AbstractState {
                 i + 1 == _lAccounts.size()));
       }
     } else {
-      _session.send(
+		_session.send(new SendSYSOLM("No user names to choose"));//SKERN
+		
+             
+              _session.send(
           new MenuItem(
-              0, "No user names to choose", MenuItem.HEADING, MenuItem.COST_NO_CHARGE, true));
+              0, "", MenuItem.HEADING, MenuItem.COST_NO_CHARGE, true));
     }
   }
 

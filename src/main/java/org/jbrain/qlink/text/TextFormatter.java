@@ -101,7 +101,7 @@ public class TextFormatter {
   public List getList() {
     return Collections.unmodifiableList(_alText);
   }
-
+//SKERN Wat is that?
   public static void main(String a[]) {
     TextFormatter tf = new TextFormatter(TextFormatter.FORMAT_NONE, 39);
     tf.add("      " + "my1stdl.prg" + "2222222222222222222222222");

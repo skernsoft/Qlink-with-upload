@@ -176,21 +176,23 @@ public class UserManager {
    * @param city
    * @param state
    * @param country
+   * @param mail//skern
    */
   public static void updateUserInfo(
-      int userID, String name, String city, String state, String country) throws Exception {
+      int userID, String name, String city, String state, String country, String email) throws Exception { //skern
     Connection conn;
     PreparedStatement pstmt = null;
     String sql;
 
     try {
-      sql = "UPDATE users SET name = ?, city = ?, state = ?, country = ? " + "WHERE user_id = ?";
+      sql = "UPDATE users SET name = ?, city = ?, state = ?, country = ?, email = ? " + "WHERE user_id = ?";
       pstmt = DBUtils.getConnection().prepareStatement(sql);
       pstmt.setString(1, name);
       pstmt.setString(2, city);
       pstmt.setString(3, state);
       pstmt.setString(4, country);
-      pstmt.setInt(5, userID);
+	  pstmt.setString(5, email);      //skern
+      pstmt.setInt(6, userID);
       if (pstmt.executeUpdate() == 0) {
         _log.debug(pstmt.toString());
         // FIXME handle gracefully

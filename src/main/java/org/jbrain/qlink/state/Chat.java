@@ -37,6 +37,8 @@ import org.jbrain.qlink.user.QHandle;
 import org.jbrain.qlink.user.UserManager;
 import org.jbrain.qlink.util.QuotedStringTokenizer;
 
+
+
 public class Chat extends AbstractChatState {
   private static Logger _log = Logger.getLogger(Chat.class);
   private int _iSeat;
@@ -108,13 +110,33 @@ public class Chat extends AbstractChatState {
       }
     } else if (a instanceof EnterPublicRoom) {
       _log.debug("Entering public room");
+      //enter not Auditorium
+      String name = ((EnterPublicRoom) a).getRoom();
+      
+      _log.debug("Entering public room "+name);
+      
+      
+      if(name.toLowerCase().equals("auditorium")&&! _session.isStaff()){
+	
+		  _log.debug("Auditorium is not to access");//SKERN
+        // send room is full.Better will by no acces
+        _session.send(new C2());
+        
+       } else {
+      
+      
       enterRoom(((EnterPublicRoom) a).getRoom(), true);
+      }
       rc = true;
     } else if (a instanceof EnterPrivateRoom) {
       _log.debug("Entering private room");
       rc = true;
       enterRoom(((EnterPrivateRoom) a).getRoom(), false);
-    } else if (a instanceof LocateUser) {
+       _log.debug("Enter Room ");
+      
+      
+      
+     } else if (a instanceof LocateUser) {
       handle = new QHandle(((LocateUser) a).getData());
       _log.debug("Trying to locate user: '" + handle + "'");
       info = UserManager.getAccount(handle);
@@ -152,7 +174,8 @@ public class Chat extends AbstractChatState {
       _log.debug("Not Ignoring user: " + ((DeIgnoreUser) a).getData());
       // _session.send(new DeIgnoreUser());
     } else if (a instanceof EnterAuditorium) {
-      enterAuditorium();
+       _log.debug("Enter Auditorium" );
+      enterAuditorium();   
     } else if (a instanceof RequestToObserve) {
       handle = new QHandle(((RequestToObserve) a).getHandle());
       _log.debug("User requesting to observe " + handle + "'s game.");
@@ -196,12 +219,15 @@ public class Chat extends AbstractChatState {
       _log.debug("System needs to find  " + ((FindMorePartners) a).getNumberToFind());
       _session.send(new FindPartnersAck());
     } else if (a instanceof EnterBoxOffice) {
-      // this is not correct...
-      enterRoom("BoxOffice", false);
+      // stay in the Room and make Reservation
+    
       _session.send(new AuditoriumText("Heading", false));
-      _session.send(new AuditoriumText("    Item 1", false));
+      _session.send(new AuditoriumText("    Item 1", false));//shud aut of the database
       _session.send(new AuditoriumText("    Item 2", false));
-      _session.send(new AuditoriumText("    Item 3", true));
+      _session.send(new AuditoriumText("    Item 3", false));
+      _session.send(new AuditoriumText("    Item 4", true));
+      
+      
     } else if (a instanceof MakeReservation) {
       _log.debug("User made reservation for event: " + ((MakeReservation) a).getID());
       _session.send(new AuditoriumText("This is not implements yet", true));
@@ -223,8 +249,10 @@ public class Chat extends AbstractChatState {
   protected void sendRoomInfo(QSeat[] seats) {
     if (_room.isPublicRoom()) {
       _session.send(new EnterPublicRoom(_room.getName()));
+      _log.debug("room name " + _room.getName());
     } else _session.send(new EnterPrivateRoom(_room.getName()));
-    showSeats(seats, false);
+     
+   showSeats(seats, false);
   }
 
   /**
@@ -236,7 +264,7 @@ public class Chat extends AbstractChatState {
     QSeat user;
     int mySeat = 0;
     QSeat[] seats;
-
+  
     if (_room.getName().toLowerCase().equals(name.toLowerCase()) && _room.isPublicRoom() == b) {
       _log.debug("User changed to same room");
       synchronized (_room) {
@@ -245,6 +273,8 @@ public class Chat extends AbstractChatState {
         seats = _room.getSeatInfoList();
       }
       showSeats(seats, true);
+       
+      
       _log.debug("Joining room: " + name);
     } else {
       room = _mgr.joinRoom(name, _session.getHandle(), getProfile(_session.getAccountInfo()), b);
@@ -257,9 +287,15 @@ public class Chat extends AbstractChatState {
         // enter new room
         _room = room;
         seats = addListener();
-        showSeats(seats, true);
+        
+        //showSeats(seats, true);
+        if(_room.getName().toLowerCase().equals("auditorium"))
+         {showSeatsAudit(seats, true);}
+    else {showSeats(seats, true);}
       }
-    }
+     }
+    
+    
   }
 
   protected void monitorRoom(String name, boolean b) {
@@ -285,6 +321,7 @@ public class Chat extends AbstractChatState {
         seats = _room.getSeatInfoList();
       }
       showSeats(seats, true);
+      
     }
   }
 
@@ -331,20 +368,34 @@ public class Chat extends AbstractChatState {
       _session.send(new AuditoriumText((String) l.get(i), i + 1 == size));
     }
   }
-
-  /** */
+/** *///SKERN
+ private void sendAutoText() {
+    _log.debug("Defining Auto text");
+  
+  
+   
+   
+  }
   private void enterAuditorium() {
-    QSeat user;
-    QSeat[] seats;
-
-    leaveRoom();
-    _log.debug("Joining Auditorium");
+    
+    _session.send(new EnterPublicRoom("Auditorium"));//New Head
+    
+    enterRoom("Auditorium",true);//privatroom Auditorium  
+    //todo the user enter this romm dont epper in outer cilds SKERN
+  //_session.send(new CB(0,_room.getName()));// del user 0 
     _room = _mgr.joinAuditorium(_session.getHandle(), getProfile(_session.getAccountInfo()));
-    seats = addListener();
-    sendRoomInfo(seats);
-    sendAuditoriumText();
-    if (_room.canTalk()) _session.send(new AcceptingQuestions());
-    else _session.send(new RejectingQuestions());
+    showSeatsAudit(_room.getSeatInfoList(), true);
+    
+    sendAuditoriumText();//send Text 
+    
+   if (_room.canTalk()) _session.send(new AcceptingQuestions());//questions or not
+   else _session.send(new RejectingQuestions());
+     _log.debug("Add Master in Auditorium");
+
+    
+ sendAutoText();
+ 
+ 
   }
 
   /** */
@@ -357,13 +408,16 @@ public class Chat extends AbstractChatState {
               _roomPos + 1 == _rooms.length));
       _roomPos++;
     }
-    if (_roomPos < _rooms.length) {
+    //*if (_roomPos < _rooms.length) skern 30.12.22*//
+    {
       _session.send(new PauseRoomInfo("Press RETURN to continue, F5 to cancel"));
     }
   }
 
   /** */
   private void sendEventInfo() {
+	
+_session.send(new AuditoriumText((" sendEventInfo of speaker") , false));
     // TODO Need to modify this to send speaker information
     sendAuditoriumText();
   }

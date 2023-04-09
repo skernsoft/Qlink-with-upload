@@ -37,12 +37,14 @@ public class GetUserInfoState extends AbstractState {
   private static EntryDialog _cityDialog;
   private static EntryDialog _stateDialog;
   private static EntryDialog _countryDialog;
+  private static EntryDialog _mailDialog;
   private EntryDialog _verifyDialog;
   // private YesNoDialog _verifyDialog;
   private String _sName;
   private String _sCity;
   private String _sState;
   private String _sCountry;
+  private String _sEmail; 
   private boolean _bGoodData;
 
   private DialogCallBack _nameCallBack =
@@ -90,7 +92,6 @@ public class GetUserInfoState extends AbstractState {
           return false;
         }
       };
-
   private DialogCallBack _stateCallBack =
       new DialogCallBack() {
         public boolean handleResponse(AbstractDialog d, Action a) throws IOException {
@@ -115,7 +116,7 @@ public class GetUserInfoState extends AbstractState {
           return false;
         }
       };
-
+           
   private DialogCallBack _countryCallBack =
       new DialogCallBack() {
         public boolean handleResponse(AbstractDialog d, Action a) throws IOException {
@@ -131,6 +132,41 @@ public class GetUserInfoState extends AbstractState {
               return true;
             }
           } else if (a instanceof D2) {
+            _log.debug("Closing state dialog, opening mail dialog");
+            EntryDialogState state =
+                new EntryDialogState(_session, _mailDialog, _mailCallBack);
+            state.activate();
+            return true;
+          }
+          return false;
+        }
+      };
+          
+          
+          
+            //skern------------------------------------------------------------------------------------------
+  private DialogCallBack _mailCallBack =
+      new DialogCallBack() {
+		  
+        public boolean handleResponse(AbstractDialog d, Action a) throws IOException {
+          _log.debug("We received " + a.getName() + " from entry dialog");
+          if (a instanceof ZA) 
+          {
+            _sEmail = ((ZA) a).getResponse().trim();
+            if (_sEmail.equals("")) //skern
+             {
+              _session.send(
+                  ((EntryDialog) d).getErrorResponse("Please enter a valid email Adress."));
+            } else {
+              _session.send(((EntryDialog) d).getSuccessResponse("Thank you."));
+              _log.debug("User entered mail: " + _sEmail);
+              return true;
+            }
+          } 
+          
+          
+          
+          else if (a instanceof D2) {
             _log.debug("We received Dialog closing");
             // _verifyDialog=new YesNoDialog("DATAOK", YesNoDialog.TYPE_LOGIN,
             // YesNoDialog.FORMAT_NONE);
@@ -142,6 +178,7 @@ public class GetUserInfoState extends AbstractState {
             _verifyDialog.addText("City   : " + _sCity);
             _verifyDialog.addText("State  : " + _sState);
             _verifyDialog.addText("Country: " + _sCountry);
+            _verifyDialog.addText("Mail   : " + _sEmail);
             _verifyDialog.addText("\nIs this information correct ('yes' or 'no')?");
             // QState state=new YesNoMaybeDialogState(_session,_verifyDialog,_verifyCallBack);
             QState state = new EntryDialogState(_session, _verifyDialog, _verifyCallBack);
@@ -151,7 +188,7 @@ public class GetUserInfoState extends AbstractState {
           return false;
         }
       };
-
+    
   private DialogCallBack _verifyCallBack =
       new DialogCallBack() {
 
@@ -189,7 +226,7 @@ public class GetUserInfoState extends AbstractState {
             if (_bGoodData) {
               try {
                 UserManager.updateUserInfo(
-                    _session.getUserID(), _sName, _sCity, _sState, _sCountry);
+                    _session.getUserID(), _sName, _sCity, _sState, _sCountry,_sEmail);
               } catch (Exception e) {
                 _log.error("Could not add user information...");
               }
@@ -209,18 +246,29 @@ public class GetUserInfoState extends AbstractState {
     _nameDialog = new EntryDialog("ADDNAME", EntryDialog.TYPE_LOGIN, EntryDialog.FORMAT_NONE);
     _nameDialog.addText(
         "Before you begin your Q-Link experience, we need to ask you a few questions about yourself.  Please enter correct information to the following questions.\n\nPlease enter your first and last name.");
+    //-----------------------------------------------------------------------------------------
     _log.debug("Defining ADDCITY dialog");
     _cityDialog = new EntryDialog("ADDCITY", EntryDialog.TYPE_LOGIN, EntryDialog.FORMAT_NONE);
     _cityDialog.addText("Please enter your city of residence.");
+    //------------------------------------------------------------------------------------------
     _log.debug("Defining ADDSTATE dialog");
     _stateDialog = new EntryDialog("ADDSTATE", EntryDialog.TYPE_LOGIN, EntryDialog.FORMAT_NONE);
     _stateDialog.addText(
         "Please enter the your state/province of residence. You may either enter the state/province abbrevation or the complete name");
-    _log.debug("Defining ADDCNTY dialog");
-    _countryDialog = new EntryDialog("ADDCNTY", EntryDialog.TYPE_LOGIN, EntryDialog.FORMAT_NONE);
+    //--------------------------------------------------------------------------------------------
+     _log.debug("Defining ADDMAIL dialog");
+    _mailDialog = new EntryDialog("ADDMAIL", EntryDialog.TYPE_LOGIN, EntryDialog.FORMAT_NONE);//skern
+    _mailDialog.addText("Please enter your emailadress.");//skern
+     //-------------------------------------------------------------------------------------------
+    _log.debug("Defining ADDCITY dialog");
+    _countryDialog = new EntryDialog("ADDCITY", EntryDialog.TYPE_LOGIN, EntryDialog.FORMAT_NONE);
     _countryDialog.addText(
         "Please enter your country of residence.  Abbrevations (like USA) may be used in lieu of the entire country name.");
+    //---------------------------------------------------------------------------------------------
+   
+   
     _log.debug("Defining DATAOK dialog");
+    
   }
 
   public GetUserInfoState(QSession session) {

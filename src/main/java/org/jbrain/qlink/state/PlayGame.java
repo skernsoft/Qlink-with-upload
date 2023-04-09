@@ -393,7 +393,7 @@ public class PlayGame extends AbstractPhaseState {
       // need to set a timer...
       _timerTask = new InviteTimeoutTask();
       // schedule it for 30 seconds.
-      _timer.schedule(_timerTask, 30000);
+      _timer.schedule(_timerTask, 90000);
       // accept the pseudoInvite for our client.
       _game.acceptInvite();
       setPhase(PHASE_ACCEPT_INVITE);
