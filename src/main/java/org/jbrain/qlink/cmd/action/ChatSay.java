@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 @author Jim Brain
 Created on Jul 22, 2005
-
+Get data from Cient
 */
 package org.jbrain.qlink.cmd.action;
 

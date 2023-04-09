@@ -37,4 +37,5 @@ public class EnterBoxOffice extends AbstractAction {
   public EnterBoxOffice(byte[] data, int start, int len) throws CRCException {
     super(data, start, len);
   }
+  
 }
