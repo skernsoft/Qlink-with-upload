@@ -299,7 +299,7 @@ public class QConnection extends Thread {
     if (!_bSuspend) {
       // can we send more?
       int seq = 0;
-      _log.debug("Sending Queued Actions");
+      _log.debug("Sending Queued Actions ");
       while (_iQLen < QSIZE && _iQLen < _alSendQueue.size()) {
         write((Command) _alSendQueue.get(_iQLen));
       }
@@ -323,7 +323,7 @@ public class QConnection extends Thread {
       if (_keepAliveTask != null) _keepAliveTask.cancel();
       _log.debug("Sending Disconnect Action to server");
       try {
-        processActionEvent(new ActionEvent(this, new LostConnection()));
+       processActionEvent(new ActionEvent(this, new LostConnection()));
       } catch (Exception e) {
         _log.error("Unchecked Exception", e);
       }
@@ -389,12 +389,15 @@ public class QConnection extends Thread {
     cmd.setRecvSequence(_inSequence);
 
     data = cmd.getBytes();
-    _log.debug("Sending " + cmd.getName());
+    _log.debug("Sending     ????" + cmd.getName());
     byte[] d2 = new byte[data.length + 1];
     System.arraycopy(data, 0, d2, 0, data.length);
     d2[data.length] = FRAME_END;
+    
+    
     // _os.write(data);
     _os.write(d2);
+    
     // _os.write(FRAME_END);
     if (_log.isDebugEnabled())
       trace("Sending packet data at sequence " + _outSequence + ": ", d2, 0, d2.length);
@@ -415,7 +418,7 @@ public class QConnection extends Thread {
     if (_pingTimer == null) {
       _log.debug("Starting PING timer");
       _pingTimer = new PingTask();
-      _timer.scheduleAtFixedRate(_pingTimer, 2000, 2000);
+      _timer.scheduleAtFixedRate(_pingTimer, 4000, 4000);//skern
     }
   }
 
@@ -482,7 +485,7 @@ public class QConnection extends Thread {
 
     _suspendWatchdog = new SuspendWatchdog();
     _log.debug("Scheduling suspend watchdog for 5 minutes");
-    _timer.schedule(_suspendWatchdog, 5 * 60000);
+    _timer.schedule(_suspendWatchdog, 5 * 90000);
   }
 
   /** */
@@ -494,7 +497,7 @@ public class QConnection extends Thread {
       _log.debug("Creating keep alive timer");
       _keepAliveTask = new KeepAliveTask();
       _log.debug("Scheduling keep alive timer for 60 second intervals");
-      _timer.scheduleAtFixedRate(_keepAliveTask, 60000, 60000);
+      _timer.scheduleAtFixedRate(_keepAliveTask, 90000, 90000);
     } else if (_enableKeepalive) _log.warn("Resuming, but KeepAliveTask alreayd active");
     _bSuspend = false;
     try {
