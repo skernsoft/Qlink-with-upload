@@ -100,8 +100,17 @@ public class ActionFactory {
     if (action.equals(SendEmail.MNEMONIC)) {
       return new SendEmail(b, start, len);
     }
+    if (action.equals(GetSerial.MNEMONIC)) {//SKERN
+      return new GetSerial(b, start, len);
+    } 
+    if (action.equals(FileNextBlock.MNEMONIC)) {//SKERN
+      return new FileNextBlock(b, start, len);
+    }
+    if (action.equals(FileLastBlock.MNEMONIC)) {//SKERN
+      return new FileLastBlock(b, start, len);  
+    }   
     if (action.equals(EmailNextLine.MNEMONIC)) {
-      return new EmailNextLine(b, start, len);
+      return new EmailNextLine(b, start, len);   
     }
     if (action.equals(EmailLastLine.MNEMONIC)) {
       return new EmailLastLine(b, start, len);
@@ -118,14 +127,17 @@ public class ActionFactory {
     if (action.equals(EmailCanceled.MNEMONIC)) {
       return new EmailCanceled(b, start, len);
     }
+    if (action.equals(FileCanceled.MNEMONIC)) {
+      return new FileCanceled(b, start, len);  
+    }
     if (action.equals(SendOLM.MNEMONIC)) {
       return new SendOLM(b, start, len);
     }
     if (action.equals(OM.MNEMONIC)) {
       return new OM(b, start, len);
     }
-    if (action.equals(OE.MNEMONIC)) {
-      return new OE(b, start, len);
+    if (action.equals(OM.MNEMONIC)) {
+      return new OM(b, start, len);
     }
     if (action.equals(EnterAuditorium.MNEMONIC)) {
       return new EnterAuditorium(b, start, len);
@@ -171,6 +183,12 @@ public class ActionFactory {
     }
     if (action.equals(LastPostingLine.MNEMONIC)) {
       return new LastPostingLine(b, start, len);
+    }  
+    if (action.equals(LastDescriptionLine.MNEMONIC)) {//SKERN
+      return new LastDescriptionLine(b, start, len);  //SKERN 
+    }
+      if (action.equals(FileDescriptionString.MNEMONIC)) {//SKERN
+      return new FileDescriptionString(b, start, len);  //SKERN 
     }
     if (action.equals(ListMoreRooms.MNEMONIC)) {
       return new ListMoreRooms(b, start, len);
