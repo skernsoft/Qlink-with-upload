@@ -23,14 +23,20 @@ Created on Jul 26, 2005
 */
 package org.jbrain.qlink.chat;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
+import org.jbrain.qlink.db.DBUtils;
 import org.apache.log4j.Logger;
 import org.jbrain.qlink.user.QHandle;
 import org.jbrain.qlink.util.QuotedStringTokenizer;
 
 public abstract class AbstractRoomDelegate implements QRoomDelegate {
   private static Logger _log = Logger.getLogger(AbstractRoomDelegate.class);
+  
   protected static final String SYS_NAME = "System";
   private String _sName;
   // private SeatInfo[] _users = new SeatInfo[ROOM_CAPACITY];
@@ -40,32 +46,21 @@ public abstract class AbstractRoomDelegate implements QRoomDelegate {
   private boolean _bPublic;
   private boolean _bLocked;
   private static Random _die = new Random();
-  private static String[] _sResponses = new String[20];
+  private static int _sResponsmax = 21;
+  private static String[] _sResponses = new String[_sResponsmax];
   // private GameDelegate[] _userGame = new GameDelegate[ROOM_CAPACITY];
   protected ArrayList _alGames = new ArrayList();
 
-  static {
-    // probably should go into a DB or something
-    _sResponses[0] = "Signs point to yes.";
-    _sResponses[1] = "Yes.";
-    _sResponses[2] = "Reply hazy, try again.";
-    _sResponses[3] = "Without a doubt.";
-    _sResponses[4] = "My sources say no.";
-    _sResponses[5] = "As I see it, yes.";
-    _sResponses[6] = "You may rely on it.";
-    _sResponses[7] = "Concentrate and ask again.";
-    _sResponses[8] = "Outlook not so good.";
-    _sResponses[9] = "It is decidedly so.";
-    _sResponses[10] = "Better not tell you now.";
-    _sResponses[11] = "Very doubtful.";
-    _sResponses[12] = "Yes - definitely.";
-    _sResponses[13] = "It is certain.";
-    _sResponses[14] = "Cannot predict now.";
-    _sResponses[15] = "Most likely.";
-    _sResponses[16] = "Ask again later.";
-    _sResponses[17] = "My reply is no.";
-    _sResponses[18] = "Outlook good.";
-    _sResponses[19] = "Don't count on it.";
+   public boolean AbstractRoomResponse() {
+    // responses skern
+    _log.debug("Reading Responses text");
+    for (int i = 0; i < _sResponsmax; i++){
+		   _sResponses[i] = ResponsesText(i+1) ;
+		
+		 
+		}  
+ 
+return true;
   }
 
   public AbstractRoomDelegate(String name, boolean bPublic, boolean bLocked) {
@@ -252,7 +247,8 @@ public abstract class AbstractRoomDelegate implements QRoomDelegate {
   // prevent adds while getting
   // the seat list.
   protected synchronized void processEvent(RoomEvent event) {
-    if (event instanceof JoinEvent) processJoinEvent((JoinEvent) event);
+    if (event instanceof JoinEvent) {processJoinEvent((JoinEvent) event);//SKERN?
+	}
     else if (event instanceof ChatEvent) processChatEvent((ChatEvent) event);
     else if (event instanceof SystemMessageEvent)
       processSystemMessageEvent((SystemMessageEvent) event);
@@ -365,8 +361,9 @@ public abstract class AbstractRoomDelegate implements QRoomDelegate {
           _log.debug("Executing '" + text + "' from '" + info.getHandle() + "'");
           send(new ChatEvent(this, -1, "", "*" + info.getHandle() + " " + msg));
         }
-      } else if (cmd.startsWith("8ba")) {
-        send(new ChatEvent(this, -1, SYS_NAME, _sResponses[getRoll(20) - 1]));
+      } else if ((cmd.startsWith("8ba")) || (cmd.startsWith("fortune"))) {
+		  AbstractRoomResponse();
+        send(new ChatEvent(this, -1, SYS_NAME, _sResponses[getRoll(_sResponsmax) - 1]));
       } else if (cmd.startsWith("roll")) {
         // roll num size
         int num = 2, size = 6;
@@ -430,4 +427,36 @@ public abstract class AbstractRoomDelegate implements QRoomDelegate {
   private int getRoll(int size) {
     return _die.nextInt(size) + 1;
   }
-}
+  
+  static String ResponsesText (int _sKey){
+      
+      Connection conn = null;
+      Statement stmt = null;
+      ResultSet rs = null;
+      String _qlink = null;
+      
+      try {
+        conn = DBUtils.getConnection();
+        stmt = conn.createStatement();
+        
+        rs =
+            stmt.executeQuery( 
+                "SELECT text from responses WHERE responses_id =  '"
+                    + _sKey
+                    + "'");
+        while (rs.next()) {
+          _qlink = (rs.getString("text"));
+          
+        }
+        } finally {
+        DBUtils.close(rs);
+        DBUtils.close(stmt);
+        DBUtils.close(conn);
+        return  _qlink;
+      }
+    }
+  }
+//
+  
+  
+

@@ -47,27 +47,24 @@ public class RoomManager {
     addPublicRoom(new RoomDelegate(ROOM_LOBBY, true, true));
     _log.debug("Creating Auditorium");
     _auditorium = new AuditoriumDelegate("Auditorium");
-    addPrivateRoom(_auditorium);
+    addPublicRoom(_auditorium);
 
     // temp people for testing
-    /*ChatProfile p=new ChatProfile();
-    join(new QHandle("Person 1"),p);
-    join(new QHandle("Person 2"),p);
-    join(new QHandle("Person 3"),p);
-    join(new QHandle("Person 4"),p);
-    join(new QHandle("Person 5"),p);
-    join(new QHandle("Person 6"),p);
-    join(new QHandle("Person 7"),p);
-    join(new QHandle("Person 8"),p);
-    join(new QHandle("Person 9"),p);
-    join(new QHandle("Person 10"),p);*/
+   ChatProfile p=new ChatProfile();
+   
+    for (int i = 1; i <40 ; i++) {
+   
+   //join(new QHandle("Person "+i),p);
+   joinAuditorium(new QHandle ("P"+i),p);
+   
+}
   }
 
   public static RoomManager getRoomManager() {
     return _mgr;
   }
 
-  // does not need to be sync
+  // does not need to be sync Join Puplic Room
   public QRoom join(QHandle handle, ChatProfile profile) {
     String name = ROOM_LOBBY;
     QRoom room = null;
@@ -81,6 +78,7 @@ public class RoomManager {
         i++;
       }
     } while (room == null);
+    //Lobby A
     return room;
   }
 
@@ -91,7 +89,7 @@ public class RoomManager {
    * If a user tries to enter a Lobby, it will work if the Lobby is present and not full
    * If the Lobby is full, it will return null...
    */
-  // this needs to be sync
+  // this needs to be sync Syncronised
   public synchronized QRoom joinRoom(
       String name, QHandle handle, ChatProfile profile, boolean bPublic) {
     QRoomDelegate room;
@@ -115,13 +113,18 @@ public class RoomManager {
     return new NormalRoom(room, handle);
   }
 
-  // no need for sync
+  // no need for sync Join Auditorium
   public QRoom joinAuditorium(QHandle handle, ChatProfile profile) {
-    _auditorium.addViewer(handle, profile);
+	  joinRoom("Auditorium" , handle, profile, true);
+   // _auditorium.addViewer(handle, profile);
+    _log.debug("Adding room '" + handle + ", " + profile );
+    
     return new Auditorium(_auditorium, handle);
+  
   }
+ 
 
-  // no need for sync
+  // no need for sync Leave Auditorium
   public void leaveAuditorium(QHandle handle) {
     _auditorium.removeViewer(handle);
   }

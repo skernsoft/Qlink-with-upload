@@ -62,6 +62,8 @@ public interface QRoomDelegate {
 
   public String getInfo();
 
+  //public void run();//SKERN
+
   public ObservedGame observeGame(QHandle handle);
 
   public QSeat[] getExtSeatInfoList(QHandle handle);

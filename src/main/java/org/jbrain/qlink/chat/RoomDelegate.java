@@ -29,7 +29,9 @@ import org.jbrain.qlink.user.QHandle;
 public class RoomDelegate extends AbstractRoomDelegate {
   private static Logger _log = Logger.getLogger(RoomDelegate.class);
   public static final int ROOM_CAPACITY = 23;
+
   protected SeatInfo[] _users = new SeatInfo[ROOM_CAPACITY];
+ 
   private GameDelegate[] _userGame = new GameDelegate[ROOM_CAPACITY];
 
   public RoomDelegate(String name, boolean bPublic, boolean bLocked) {
@@ -61,6 +63,7 @@ public class RoomDelegate extends AbstractRoomDelegate {
    * @see org.jbrain.qlink.chat.AbstractRoomDelegate#getCapacity()
    */
   public int getCapacity() {
+
     return ROOM_CAPACITY;
   }
 

@@ -58,11 +58,11 @@ class AuditoriumDelegate extends RoomDelegate {
   private static Logger _log = Logger.getLogger(AuditoriumDelegate.class);
   private static QHandle _qlink = new QHandle("Q-Link");
   private List _queue = Collections.synchronizedList(new ArrayList());
-  private boolean _bAcceptingQuestions = false;
+  private boolean _bAcceptingQuestions = true; //Auditorium Talk
   private List _vRegList = new Vector();
   private AutoText _autoTalk;
   private Hashtable _htViewers = new Hashtable();
-  private static final int ID_VIEWER = 23;
+  private static final int ID_VIEWER = 200;
 
   class AutoText extends Thread {
     // private String pad="                              ";
@@ -73,7 +73,7 @@ class AuditoriumDelegate extends RoomDelegate {
       // this.setDaemon(true);
       this.start();
     }
-
+//
     public void run() {
       Connection conn = null;
       Statement stmt = null;
@@ -82,7 +82,7 @@ class AuditoriumDelegate extends RoomDelegate {
       try {
         conn = DBUtils.getConnection();
         stmt = conn.createStatement();
-        _log.debug("Reading auditorium text");
+        _log.debug("Reading auditorium text key" + _sKey);
         rs =
             stmt.executeQuery(
                 "SELECT delay,text from auditorium_talk WHERE mnemonic LIKE '"
@@ -105,7 +105,7 @@ class AuditoriumDelegate extends RoomDelegate {
       }
     }
   }
-
+//
   public QSeat[] getSeatInfoList(QHandle handle) {
     // get list of speakers/moderators.
     QSeat[] seats = super.getSeatInfoList(handle);
@@ -119,12 +119,12 @@ class AuditoriumDelegate extends RoomDelegate {
     }
     return seats;
   }
-
+//
   /** @param name */
   public AuditoriumDelegate(String name) {
     super(name, false, true);
   }
-
+//
   public synchronized void queue(QHandle handle, String[] question) {
     _queue.add(new Question(handle, question));
 
@@ -136,13 +136,13 @@ class AuditoriumDelegate extends RoomDelegate {
       }
     }
   }
-
+//
   public void leave(QHandle handle) {
     QSeat seat = getSeatInfo(handle);
     _vRegList.remove(seat);
     super.leave(handle);
   }
-
+//
   private void output(QHandle handle, String text) {
     TextFormatter tf = new TextFormatter(TextFormatter.FORMAT_PADDED, 29);
     List l;
@@ -167,7 +167,7 @@ class AuditoriumDelegate extends RoomDelegate {
       }
     }
   }
-
+// this 
   /**
    * @param user
    * @param text
@@ -266,10 +266,16 @@ class AuditoriumDelegate extends RoomDelegate {
     for (int i = 0, size = q.getQuestion().length; i < size; i++) l.add(q.getQuestion()[i]);
   }
 
+//this 
+
   /** @return */
   public boolean canTalk() {
     return _bAcceptingQuestions;
   }
+
+
+//this works
+
 
   public String getInfo() {
     // we'll grab the speaker information here.
@@ -321,6 +327,7 @@ class AuditoriumDelegate extends RoomDelegate {
   public QSeat addViewer(QHandle handle, ChatProfile profile) {
     QSeat seat = new SeatInfo(handle, ID_VIEWER, profile);
     _htViewers.put(handle.getKey(), seat);
+     _log.debug("get auditorium seat-------------------------------------------------------------------------------------------");
     return seat;
   }
 
