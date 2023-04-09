@@ -35,21 +35,22 @@ public class MenuItem extends AbstractMenuItem {
 
   public static final int MENU = 0x81;
   public static final int TEXT = 0x82;
-  public static final int UNKNOWN_83 = 0x83;
-  public static final int UNKNOWN_84 = 0x84;
+  public static final int Error_83 = 0x83;
+  public static final int BROWSE = 0x84; //SKERN
   public static final int GATEWAY = 0x85;
   public static final int AREA_MENU = 0x86;
   public static final int POST_OFFICE = 0x87;
   public static final int MULTI_TEXT = 0x88;
-  public static final int UNKNOWN_89 = 0x89;
+  public static final int Error_89 = 0x89;
   public static final int DOWNLOAD = 0x8A;
   public static final int CHAT = 0x8B;
   public static final int UNKNOWN_8C = 0x8C;
   public static final int UPLOAD = 0x8d;
-  public static final int UNKNOWN_8E = 0x8E;
+  public static final int ONEMOMENT = 0x8E;
   public static final int MENU_DATA = 0x8F;
   public static final int FILE_DESC = 0x90;
-
+  public static final int SERIAL = 0x91; //SKERN
+  
   public static final int COST_NORMAL = 2;
   public static final int COST_PREMIUM = 1;
   public static final int COST_NO_CHARGE = 0;

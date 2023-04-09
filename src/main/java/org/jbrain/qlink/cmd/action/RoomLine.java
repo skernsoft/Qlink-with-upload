@@ -34,17 +34,23 @@ public class RoomLine extends AbstractAction {
     super((last ? "LD" : "LM"));
     _iNum = num;
     _sName = name;
+    
   }
 
   public byte[] getBytes() {
+	int i1 = _iNum;   
+    int i3 =  (i1 / 100);
+    i1 = i1 - i3*100;
+    int i2 =  (i1 / 10);
+    i1 = i1 - i2*10;
     byte[] b = AbstractAction.getBytes(_sName);
     byte[] data = new byte[10 + 4 + 20];
     // fill with spaces.
     Arrays.fill(data, (byte) 0x20);
-    data[10] = (byte) _iNum;
-    if (data[10] == 0x0d) data[10]++;
-    if (_iNum >= 10) data[11] = (byte) ((_iNum / 10) + '0');
-    data[12] = (byte) ((_iNum % 10) + '0');
+    if (_iNum >=100) data[10] = (byte) (i3 + 48);
+   // if (data[10] == 0x0d) data[10]++;
+    if (_iNum >= 10) data[11] = (byte) (i2 + 48);
+    data[12] = (byte) (i1 + 48);
     data[13] = (byte) 0x90;
     int len = Math.min(b.length, 20);
     System.arraycopy(b, 0, data, 14, len);

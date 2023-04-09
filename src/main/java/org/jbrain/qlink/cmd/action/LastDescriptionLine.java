@@ -18,22 +18,17 @@ along with QLinkServer; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 @author Jim Brain
-Created on Jul 22, 2005
-
+Created on Aug 29, 2005
+SKERN
 */
 package org.jbrain.qlink.cmd.action;
 
 import org.jbrain.qlink.cmd.CRCException;
 
-public class RequestGameRestart extends AbstractAction {
+public class LastDescriptionLine extends AbstractStringAction {
+  public static final String MNEMONIC = "KL";
 
-  public static final String MNEMONIC = "GV";
-
-  public RequestGameRestart(byte[] data, int start, int len) throws CRCException {
+  public LastDescriptionLine(byte[] data, int start, int len) throws CRCException {
     super(data, start, len);
-  }
-  /** */
-  public RequestGameRestart() {
-    super(MNEMONIC);
   }
 }

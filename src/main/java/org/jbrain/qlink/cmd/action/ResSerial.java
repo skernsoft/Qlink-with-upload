@@ -23,17 +23,9 @@ Created on Jul 22, 2005
 */
 package org.jbrain.qlink.cmd.action;
 
-import org.jbrain.qlink.cmd.CRCException;
+public class ResSerial extends AbstractStringAction {
 
-public class RequestGameRestart extends AbstractAction {
-
-  public static final String MNEMONIC = "GV";
-
-  public RequestGameRestart(byte[] data, int start, int len) throws CRCException {
-    super(data, start, len);
-  }
-  /** */
-  public RequestGameRestart() {
-    super(MNEMONIC);
+  public ResSerial (String text) {
+    super("KT", text);
   }
 }

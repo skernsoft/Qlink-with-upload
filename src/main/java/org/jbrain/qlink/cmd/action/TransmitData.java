@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 @author Jim Brain
 Created on Aug 12, 2005
-
+ 
 */
 package org.jbrain.qlink.cmd.action;
 
